@@ -11,11 +11,43 @@ import {
 import { Loader2, Plus } from "lucide-react";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
+import axios from "axios";
+import { useMutation } from "@tanstack/react-query";
+import { useRouter } from "next/navigation";
 
 type Props = {};
 
 const CreateIdeaDialog = (props: Props) => {
+  const router = useRouter();
   const [input, setInput] = useState("");
+
+  const createIdeaBook = useMutation({
+    mutationFn: async () => {
+      const response = await axios.post("/api/createIdeaBook", {
+        name: input,
+      });
+      return response.data;
+    },
+  });
+
+  const handleSubmit = (error: React.FormEvent<HTMLFormElement>) => {
+    error.preventDefault();
+    if (!input) {
+      window.alert("Please Enter a name for your Idea Book");
+      return;
+    }
+    createIdeaBook.mutate(undefined, {
+      onSuccess: ({ idea_id }) => {
+        console.log("Idea Book created", { idea_id });
+        router.push(`/ideabook/${idea_id}`);
+      },
+      onError: (error) => {
+        console.error(error);
+        window.alert("Idea Book creation failed");
+      },
+    });
+  };
+
   return (
     <Dialog>
       <DialogTrigger>
@@ -33,16 +65,19 @@ const CreateIdeaDialog = (props: Props) => {
             You can write down new ideas by clicking the button below.
           </DialogDescription>
         </DialogHeader>
-        <form>
-          <Input 
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          placeholder="Name your Idea Book" />
+        <form onSubmit={handleSubmit}>
+          <Input
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            placeholder="Name your Idea Book"
+          />
           <div className="flex items-center justify-between mt-5">
             <Button type="reset" variant={"secondary"}>
               Cancel
             </Button>
-            <Button type="reset" variant={"secondary"}>
+            <Button 
+            
+            type="submit" variant={"secondary"}>
               Create
             </Button>
           </div>
