@@ -21,6 +21,7 @@ const Editor = ({ idea }: Props) => {
   const [editorState, setEditorState] = useState(idea.editorState || "");
   const [hasStartedTyping, setHasStartedTyping] = useState(false);
 
+
   const { complete, completion } = useCompletion({
     api: "/api/completion",
   });
@@ -46,15 +47,7 @@ const Editor = ({ idea }: Props) => {
       };
     },
   });
-  // const editor = useEditor({
-  //   autofocus: true,
-  //   extensions: [StarterKit, customedText],
-  //   content: editorState,
-  //   onUpdate: ({ editor }) => {
-  //     setEditorState(editor.getHTML());
-  //   },
-  // });
-
+  
   const editor = useEditor({
     extensions: [
       StarterKit,
