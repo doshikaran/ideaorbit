@@ -3,6 +3,8 @@ import React, { useEffect, useState, useRef } from "react";
 import { EditorContent, useEditor } from "@tiptap/react";
 import { StarterKit } from "@tiptap/starter-kit";
 import Text from "@tiptap/extension-text";
+import Placeholder from "@tiptap/extension-placeholder";
+
 import EditorMenuBar from "./EditorMenuBar";
 import { Button } from "./ui/button";
 import { useDebounce } from "@/lib/useDebounce";
@@ -16,12 +18,9 @@ interface Props {
 }
 
 const Editor = ({ idea }: Props) => {
-  const [editorState, setEditorState] = useState(
-    idea.editorState ||
-      `
-  <h1>${idea.name}</h1>
-  `
-  );
+  const [editorState, setEditorState] = useState(idea.editorState || "");
+  const [hasStartedTyping, setHasStartedTyping] = useState(false);
+
   const { complete, completion } = useCompletion({
     api: "/api/completion",
   });
@@ -47,12 +46,33 @@ const Editor = ({ idea }: Props) => {
       };
     },
   });
+  // const editor = useEditor({
+  //   autofocus: true,
+  //   extensions: [StarterKit, customedText],
+  //   content: editorState,
+  //   onUpdate: ({ editor }) => {
+  //     setEditorState(editor.getHTML());
+  //   },
+  // });
+
   const editor = useEditor({
+    extensions: [
+      StarterKit,
+      customedText,
+      Placeholder.configure({
+        placeholder: "start typing here",
+        showOnlyWhenEditable: true,
+        showOnlyCurrent: true,
+        includeChildren: false,
+      }),
+    ],
     autofocus: true,
-    extensions: [StarterKit, customedText],
     content: editorState,
     onUpdate: ({ editor }) => {
       setEditorState(editor.getHTML());
+      if (!hasStartedTyping) {
+        setHasStartedTyping(true);
+      }
     },
   });
 
@@ -97,8 +117,13 @@ const Editor = ({ idea }: Props) => {
       </div>
 
       {/* tips */}
-      <div className=" mt-5">
-        <span className="text-sm">
+      <div className=" mt-5 flex flex-col space-y-5">
+        {!hasStartedTyping && ( 
+          <h1 className="text-[12px] tracking-widest font-medium">
+            Click above and start typing....
+          </h1>
+        )}
+        <span className="text-sm text-gray-500 tracking-widest">
           Tip: Press{" "}
           <kbd className="px-2 py-2 tracking-widest text-xs font-semibold text-gray-800 bg-gray-100 border border-gray-200 rounded-lg">
             Shift + A
