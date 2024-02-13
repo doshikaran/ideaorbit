@@ -30,6 +30,15 @@ const CreateIdeaDialog = (props: Props) => {
     },
   });
 
+  const uploadToFirebase = useMutation({
+    mutationFn: async (ideaId: string) => {
+      const response = await axios.post("/api/uploadToFirebase", {
+        ideaId,
+      });
+      return response.data;
+    },
+  });
+
   const handleSubmit = (error: React.FormEvent<HTMLFormElement>) => {
     error.preventDefault();
     if (!input) {
@@ -39,6 +48,7 @@ const CreateIdeaDialog = (props: Props) => {
     createIdeaBook.mutate(undefined, {
       onSuccess: ({ idea_id }) => {
         console.log("Idea Book created", { idea_id });
+        uploadToFirebase.mutate(idea_id);
         router.push(`/ideabook/${idea_id}`);
       },
       onError: (error) => {
@@ -75,9 +85,15 @@ const CreateIdeaDialog = (props: Props) => {
             <Button type="reset" variant={"secondary"}>
               Cancel
             </Button>
-            <Button 
-            
-            type="submit" variant={"secondary"}>
+
+            <Button
+              disabled={createIdeaBook.isPending}
+              type="submit"
+              variant={"secondary"}
+            >
+              {createIdeaBook.isPending && (
+                <Loader2 className=" w-3 h-3 mr-2 animate-spin" />
+              )}
               Create
             </Button>
           </div>
