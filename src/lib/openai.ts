@@ -35,6 +35,7 @@ export async function generateImagePrompt(name: string) {
 export async function generateImage(image_description: string) {
   try {
     const response = await openai.createImage({
+      // model: "image-alpha-001",
       prompt: image_description,
       n: 1,
       size: "256x256",

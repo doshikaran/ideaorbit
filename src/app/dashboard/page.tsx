@@ -62,7 +62,7 @@ const Dashboard = async (props: Props) => {
                       src={idea.imageUrl || ""}
                     />
                     <div className=" p-5">
-                      <h3 className=" uppercase tracking-wider font-bold text-xl text-black">
+                      <h3 className=" uppercase tracking-wider font-bold text-sm text-black">
                         {idea.name}
                       </h3>
                       <p className=" mt-3 text-xs">
